@@ -36,10 +36,7 @@ class _CardPageState extends ConsumerState<CardPage> {
         child: Container(
           width: double.maxFinite,
           height: MediaQuery.of(ctx).size.height * 0.85,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -49,10 +46,7 @@ class _CardPageState extends ConsumerState<CardPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Add Card', style: AppTextStyle.outFitBoldStyle.copyWith(fontSize: 18)),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(ctx).pop(),
-                    ),
+                    IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.of(ctx).pop()),
                   ],
                 ),
               ),
@@ -60,16 +54,25 @@ class _CardPageState extends ConsumerState<CardPage> {
               Expanded(
                 child: LayoutBuilder(
                   builder: (_, constraints) {
-                    final w = constraints.maxWidth.isFinite ? constraints.maxWidth : 800.0;
-                    final h = constraints.maxHeight.isFinite ? constraints.maxHeight : 600.0;
+                    final w = (constraints.maxWidth.isFinite && constraints.maxWidth > 0)
+                        ? constraints.maxWidth
+                        : 800.0;
+                    final h = (constraints.maxHeight.isFinite && constraints.maxHeight > 0)
+                        ? constraints.maxHeight
+                        : 600.0;
                     return SizedBox(
                       width: w,
                       height: h,
                       child: WebViewX(
-                        initialContent: cardUrl,
-                        initialSourceType: SourceType.urlBypass,
+                        initialContent: 'about:blank',
+                        initialSourceType: SourceType.url,
                         width: w,
                         height: h,
+                        onWebViewCreated: (controller) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            controller.loadContent(cardUrl, SourceType.url);
+                          });
+                        },
                         onPageFinished: (_) {},
                       ),
                     );
